@@ -83,7 +83,7 @@ for message in content.get_elements_of_type(Message):
     if len(message.constants) > 0:
         print(indent * indent_depth + '// Constants:')
     for constant in message.constants:
-        print(indent * indent_depth + 'public const %s %s = %s;'%(rosidl_generator_cs.msg_type_to_cs(constant.type), constant.name, constant.value))
+        print(indent * indent_depth + 'public const %s %s = %s;'%(rosidl_generator_cs.msg_type_to_cs(constant.type), constant.name, rosidl_generator_cs.value_to_cs(constant.type, constant.value)))
     sys.stdout.write('\n')
 
     #default constructor
@@ -171,7 +171,7 @@ for service in content.get_elements_of_type(Service):
         if len(service.request_message.constants) > 0:
             print(indent * indent_depth + '// Constants:')
         for constant in service.request_message.constants:
-            print(indent * indent_depth + 'public const %s %s = %s;'%(rosidl_generator_cs.msg_type_to_cs(constant.type), constant.name, constant.value))
+            print(indent * indent_depth + 'public const %s %s = %s;'%(rosidl_generator_cs.msg_type_to_cs(constant.type), constant.name, rosidl_generator_cs.value_to_cs(constant.type, constant.value)))
         sys.stdout.write('\n')
 
         #default constructor

@@ -95,7 +95,7 @@ def msg_type_only_to_cs(type_):
     elif isinstance(type_, AbstractString):
         cs_type = MSG_TYPE_TO_CS['string']
     elif isinstance(type_, AbstractWString):
-        c_type = MSG_TYPE_TO_CS['wstring']
+        cs_type = MSG_TYPE_TO_CS['wstring']
     elif isinstance(type_, NamespacedType):
         typename = '.'.join(type_.namespaced_name())
         cs_type = typename
@@ -138,7 +138,7 @@ def value_to_cs(type_, value):
     """
     Convert a python value into a string representing that value in C#.
 
-    This is equivalent to primitive_value_to_cpp but can process arrays values as well
+    This is equivalent to primitive_value_to_cs but can process arrays values as well
 
     Warning this still processes only primitive types
     @param type_: a ROS IDL type
@@ -193,6 +193,9 @@ def primitive_value_to_cs(type_, value):
     if isinstance(type_, AbstractWString):
         return 'u"%s"' % escape_wstring(value)
 
+    if isinstance(type_, AbstractGenericString):
+        return '"%s"' % escape_string(value)
+
     if type_.typename == 'boolean':
         return 'true' if value else 'false'
 
@@ -210,24 +213,27 @@ def primitive_value_to_cs(type_, value):
         # Handle edge case for INT32_MIN
         # Specifically, MSVC is not happy in this case
         if -2147483648 == value:
-            return '({0}l - 1)'.format(value + 1)
-        return '%sl' % value
+            return '({0} - 1)'.format(value + 1)
+        return '%s' % value
 
     if type_.typename == 'uint32':
-        return '%sul' % value
+        return '%s' % value
 
     if type_.typename == 'int64':
         # Handle edge case for INT64_MIN
         # See https://en.cppreference.com/w/cpp/language/integer_literal
         if -9223372036854775808 == value:
-            return '(%sll - 1)' % (value + 1)
-        return '%sll' % value
+            return '(%sL - 1)' % (value + 1)
+        return '%sL' % value
 
     if type_.typename == 'uint64':
-        return '%sull' % value
+        return '%sUL' % value
 
     if type_.typename == 'float':
         return '%sf' % value
+
+    if type_.typename == 'string':
+        return '"%s"' % value
 
     assert False, "unknown primitive type '%s'" % type_.typename
 
